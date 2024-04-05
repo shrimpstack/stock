@@ -11,13 +11,11 @@
   enable-background="new 0 0 20 20"
   xml:space="preserve"
 >
-  <image
-    href="https://images.plurk.com/5jBLmr6WQMkpuR195CdCGS.png"
-  >
+  <image>
     <animate
       attributeName="href" 
-      from="https://images.plurk.com/5jBLmr6WQMkpuR195CdCGS.png" 
-      to="https://images.plurk.com/7GQO1utv5sUeMp2RNaO5Z0.png"
+      from="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAMAAAC6V+0/AAAAclBMVEX5+f3////+/v79/Pz9+/v8+/v8+vr7+fn7+Pj6+Pj69/f69vb59vb39vb59fX49fX49PTx7u7u7Ozo5+ehnZ2gnZ2fnJyfm5uQjIuKhoWFgYDwMaeEXV1YUlFtNDREPj1DPTxDNTVAMjI8LS06KystJiVYpYjvAAAAuElEQVR42m2Riw7CIAxFx3xs4h7oHigVmBP+/xctHSyYeEIIOaGluRQRb7W2vshZ5MCQQS678qplkVb56GaWMW1WsRz+oH5U+0pb14e+kv1w4RI74rvOJbU63t19YdEZ4wKf94on0dlCk2SG0UZSoyQbQSd6jeVkmaHlKhHK/UA2UvYANx9GgmwgvDhuwycNVScAKBQF6MrD8XziAALUFsgEvGlqfm0AoJ5TTE/YUeQIOwIRQ/77HV8pohSlHEtgtgAAAABJRU5ErkJggg==" 
+      to="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAMAAAC6V+0/AAAAdVBMVEX5+f0tJiVEPj1YUlFDPTyfm5vo5+f///+FgYD39vafnJygnZ2EXV369/eQjIv59fX49fU6KytAMjL6+PhtNDQ8LS1DNTXu7Oz49PT+/f37+fn+/v7wMafx7u6hnZ39/Pz9+/v8+vr8+/v59vb7+Pj69vaKhoVop8Q8AAAAAW9yTlQBz6J3mgAAAL9JREFUGNNlkYsOgyAMRXmoRR1D1G1Mu6du//+J46kkOySkOSlNcyEkQBnnjJKcoqzAUpXFpqioIVKL2E0byGiDFa4+pEse/bw6bwTVubklgNZJ9XqQpZ1YgR5H7Tide1upCyUMnAR7wqWNYoSDtwltjOJeWusbR9BXYzrunjsbgcm457TKF5o7xBt1K+EuB9t4j8tHjZMyiD4UgdbNj+frLRENihBIi3JZVvlZEHFtUkxf3BB70OweVBby33f8AEM3EEtvNvsyAAAAAElFTkSuQmCC"
       dur="0.2s"
       repeatCount="indefinite"
     />
