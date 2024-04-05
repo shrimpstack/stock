@@ -1,0 +1,25 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  version="1.1"
+  id="Layer_1"
+  x="0px"
+  y="0px"
+  width="20px"
+  height="20px"
+  viewBox="0 0 20 20"
+  enable-background="new 0 0 20 20"
+  xml:space="preserve"
+>
+  <image
+    href="https://images.plurk.com/5jBLmr6WQMkpuR195CdCGS.png"
+  >
+    <animate
+      attributeName="href" 
+      from="https://images.plurk.com/5jBLmr6WQMkpuR195CdCGS.png" 
+      to="https://images.plurk.com/7GQO1utv5sUeMp2RNaO5Z0.png"
+      dur="0.2s"
+      repeatCount="indefinite"
+    />
+  </image>
+</svg>
