@@ -1,0 +1,76 @@
+<style>
+  table {
+    text-align: center;
+  }
+  th {
+    border-bottom: 2px solid #333;
+    width: 60px;
+  }
+  th:first-child {
+    width: 100px;
+  }
+  th:last-child {
+    width: 300px;
+  }
+  td:last-child input {
+    width: 100%;
+  }
+  td:not(:last-child) {
+    height: 30px;
+    border-bottom: 1px solid #aaa;
+  }
+</style>
+<table>
+  <thead>
+    <tr><th>試聽按紐</th><th>上線</th><th>下線</th><th>新訊息</th><th>備註</th></tr>
+  </thead>
+  <tbody id="btns"></tbody>
+</table>
+<script src="https://shrimpstack.github.io/my_js/universal.js"></script>
+<script>
+  window.addEventListener("load", () => {
+    [
+      "13654.mp3",
+      "m-art_OK1.wav",
+      "木魚.mp3",
+      "水滴.mp3",
+      "叮咚.mp3",
+      "叮楞.mp3",
+      "布U.mp3",
+      "布鈴.mp3",
+      "布應.mp3",
+      "咕鈴.mp3",
+      "登咚.mp3",
+      "登鈴鈴.mp3",
+      "等楞.mp3",
+      "嘟we.mp3",
+      "嘟愣鈴.mp3",
+      "嘟嗡嗡.mp3",
+      "嘟鈴.mp3",
+      "嘟噔.mp3",
+      "噔噔.mp3",
+
+      "等登.mp3",
+      "登嘟.mp3",
+      "嘟登叮.mp3",
+      "叮登嘟.mp3",
+    ].forEach(file_name => {
+      let btn = new_el("button", file_name.replace(/\.[^\.]*$/, ""));
+      btn.addEventListener("click", () => play_se("./" + file_name));
+      let tr = new_el_to_el(btns, "tr", [
+        new_el("td", btn),
+        new_el("td", new_el("input", {type: "checkbox"})),
+        new_el("td", new_el("input", {type: "checkbox"})),
+        new_el("td", new_el("input", {type: "checkbox"})),
+        new_el("td", new_el("input")),
+      ]);
+    });
+  });
+  function play_se(src) {
+    let audio = new Audio();
+    audio.addEventListener("canplaythrough", () => {
+        audio.play();
+    });
+    audio.src = src;
+  }
+</script>
