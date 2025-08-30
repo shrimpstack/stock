@@ -394,7 +394,7 @@
         /* 每針 */
         Object.defineProperty(obj, "max", {
           get: () => {
-            let max = 樂譜.childElementCount * 顯示設定.c / 4 - 0.25;
+            return 樂譜.childElementCount * 顯示設定.c / 4 - 0.25;
           },
         });
         Object.defineProperty(obj, "播針", { value: 播針, writable: false });
