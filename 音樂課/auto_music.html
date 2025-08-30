@@ -33,11 +33,24 @@
         --sq_wg: calc(var(--sq_w) + var(--gap));
         --cell_w: calc(var(--sq_wg) * 4 - var(--gap));
         --cell_wg: calc(var(--cell_w) + var(--gap));
-        background: linear-gradient(90deg, #0000 var(--cell_w), #c3c3c3 var(--cell_w)) left / var(--cell_wg) auto,
+        background: linear-gradient(#8ec98e30) no-repeat left calc(var(--sq_hg) * 5) / 100% var(--sq_h),
+                    linear-gradient(90deg, #0000 var(--cell_w), #c3c3c3 var(--cell_w)) left / var(--cell_wg) auto,
                     linear-gradient(#0000 var(--sq_h), #dfdfdf var(--sq_h)) top / auto calc(var(--sq_h) + var(--gap)),
                     linear-gradient(90deg, #0000 var(--sq_w), #dfdfdf var(--sq_w)) left / var(--sq_wg) auto;
         background-color: #eee;
         overflow: hidden;
+      }
+      .小節:after {
+        content: attr(index);
+        grid-area: 1 / 1;
+        font-size: var(--sq_h);
+        font-family: sans-serif;
+        text-align: center;
+        pointer-events: none;
+        position: relative;
+        top: -1px;
+        font-weight: bold;
+        opacity: .5;
       }
       .小節 i {
         border: 1px solid #0003;
@@ -60,6 +73,7 @@
       i.落地鼓 { grid-row: 7; background: #a99bdd; } i.落地鼓:before { content: "碰"; }
       i.大鼓 { grid-row: 8; background: #ef9e9e; } i.大鼓:before { content: "動"; }
       i.腳踏鈸 { grid-row: 9; background: #ebe697; } i.腳踏鈸:before { content: "他"; }
+      i.碎音鈸[style="grid-column: 1 / span 1;"]:before { display: none; }
       #樂譜.不要字 i:before { display: none; }
       i[l="4"] { grid-column-end: 16 span; }
       i[l="3"] { grid-column-end: 12 span; }
@@ -89,10 +103,10 @@
       <button onclick="新增小節()">新增小節</button>
       <button onclick="回退一步()">上一步</button>
       <button onclick="重做一步()">下一步</button><br/>
-      <button onclick="播放_停止()">停止</button>
-      <button onclick="播放_暫停()">暫停</button>
-      <button onclick="播放_播放()">播放</button>
-      BPM <input id="BPM" type="number" oninput="改變BPM()" value="60" style="width: 60px;"/>
+      <button onclick="播放器.停止()">停止</button>
+      <button onclick="播放器.暫停()">暫停</button>
+      <button onclick="播放器.播放()">播放</button>
+      BPM <input id="BPM" type="number" oninput="播放器.改變BPM()" value="60" style="width: 60px;"/>
       指針 <input id="播放_cur" type="number" oninput="改變播放_cur()" step="0.25" value="0" style="width: 60px;"/>
       <button onclick="播放_cur.value = +播放_cur.value - 0.25; 改變播放_cur();">←</button>
       <button onclick="播放_cur.value = +播放_cur.value + 0.25; 改變播放_cur();">→</button><br/>
@@ -100,19 +114,9 @@
       <label><input id="不要聲音" type="checkbox" checked />不要聲音</label>
     </div>
     <div id="樂譜" class="不要字" onclick="點整個譜()">
-      <div class="小節"><mark id="mark"></mark></div>
+      <div class="小節" index="1"><mark id="mark"></mark></div>
     </div>
     <script>
-      const 鼓聲 = {
-        大鼓: "bass", 小鼓: "share-drum", 小鼓_鼓框: "share-stick",
-        // BD bass drum; SD; SS
-        高音中鼓: "tom1", 低音中鼓: "tom2", 落地鼓: "floor-tom",
-        // T1 high tom; T2 low tom; FT
-        碎音鈸: "crash", 疊音鈸: "ride",
-        // CC crash cymbal; RC ride cymbal
-        高帽鈸: "hihat", 高帽鈸_開鈸: "hihat-open", 腳踏鈸: "hihat-foot",
-        // HH; HO; HF
-      };
       const 聲編號 = {
         大鼓: "BD", 小鼓: "SD", 小鼓_鼓框: "SS",
         高音中鼓: "HT", 低音中鼓: "LT", 落地鼓: "FT",
@@ -189,6 +193,7 @@
         let 新小節 = document.createElement("div");
         新小節.classList.add("小節");
         樂譜.append(新小節);
+        新小節.setAttribute("index", document.querySelectorAll(".小節").length);
       }
 
       /* ================================ */
@@ -265,12 +270,23 @@
       async function 儲存目前的譜() {
         let btn = document.querySelector('[onclick="儲存目前的譜()"]');
         btn.disabled = true;
-        let 譜名 = 儲存譜名.value;
-        let 一句 = XXXX
-        
+        let sents = {};
+        let sheet = [];
+        let 譜長 = Math.ceil(document.querySelectorAll(".小節").length / 4);
+        for(let f = 0; f < 譜長; f++) {
+          let 拍起頭 = f * 16;
+          let 小節起頭 = f * 4;
+          let sent_name = "sent" + 小節起頭;
+          sents[sent_name] = 取得譜(拍起頭, 16);
+          if(小節起頭 % 16 == 0) sheet.push(`[${小節起頭}]${sent_name}`);
+          else sheet[Math.floor(小節起頭 / 16)] += ` [${小節起頭}]${sent_name}`;
+        }
+        let res = await post("儲存譜", {name: 儲存譜名.value, sents, sheet});
+        alert(res.data.error || res.data.success);
         btn.disabled = false;
       }
       async function 讀取固定譜() {
+        播放器.停止();
         let btn = document.querySelector('[onclick="讀取固定譜()"]');
         btn.disabled = true;
         let res = await post("取得固定譜", {name: 固定譜名.value});
@@ -281,7 +297,7 @@
         btn.disabled = false;
       }
       async function 產生隨機譜() {
-        播放_停止();
+        播放器.停止();
         let btn = document.querySelector('[onclick="產生隨機譜()"]');
         btn.disabled = true;
         let res = await post("取得隨機譜雛形", {});
@@ -338,7 +354,7 @@
         });
         let 結尾 = Math.max(...新譜.map(({時, 長}) => 時 + 長));
         let 幾小節 = Math.ceil(結尾 / (顯示設定.c / 4));
-        播放_停止();
+        播放器.停止();
         while(樂譜.childElementCount < 幾小節) 新增小節();
         新譜.forEach(data => 新音(data));
       }
@@ -346,63 +362,110 @@
       /* ================================ */
       /*  播放                            */
       /* ================================ */
-      let 播放_interval = null;
-      function 改變播放_cur() {
-        播放_cur.value = Math.floor(播放_cur.value * 4 / 1) / 4;
-        let max = 樂譜.childElementCount * 顯示設定.c / 4 - 0.25;
-        播放_cur.value = Math.min(Math.max(播放_cur.value, 0), max);
-        播放一針();
-      }
-      function 播放一針() {
-        let 小節i = Math.floor(播放_cur.value / (顯示設定.c / 4));
-        let 小節 = 樂譜.children[小節i];
-        if(!小節) return 播放_停止();
-        小節.append(mark);
-        樂譜.scrollTop = 小節.offsetTop - 樂譜.offsetTop;
+      const 播放器 = (() => {
+        const obj = {};
+        let 播放狀態 = false;
+        let 開始時間 = 0;
+        let 間隔 = 0;
 
-        let c = 播放_cur.value % (顯示設定.c / 4) * 4 + 1;
-        mark.style.gridColumn = c;
-        let 要播放的 = 譜.filter(({時}) => 時 == +播放_cur.value).map(data => {
-          if(data.鼓框) return "小鼓_鼓框";
-          if(data.開鈸) return "高帽鈸_開鈸";
-          return data.音;
-        });
-        播放_聲音(要播放的);
-      }
-      function 播放_停止() {
-        播放_暫停();
-        樂譜.children[0].append(mark);
-        mark.style.gridColumn = 1;
-        播放_cur.value = 0;
-        樂譜.scrollTop = 0;
-      }
-      function 播放_暫停() {
-        clearInterval(播放_interval);
-        播放_interval = null;
-      }
-      function 播放_播放() {
-        if(播放_interval) return;
-        播放一針();
-        播放_interval = setInterval(() => {
+        /* 控制區 */
+        obj.播放 = function() {
+          開始時間 = new Date().getTime();
+          播放狀態 = true;
+        }
+        obj.暫停 = function() {
+          播放狀態 = false;
+        }
+        obj.停止 = function() {
+          播放狀態 = false;
+          樂譜.children[0].append(mark);
+          mark.style.gridColumn = 1;
+          播放_cur.value = 0;
+          樂譜.scrollTop = 0;
+        }
+
+        /* 設定區 */
+        Object.defineProperty(obj, "改變BPM", { value: 改變BPM, writable: false });
+        function 改變BPM() {
+          間隔 = 60e3 / +BPM.value / 4;
+        }
+        改變BPM();
+
+        /* 每針 */
+        function 播針() {
+          /* 整數與最大值調整 */
+          播放_cur.value = Math.floor(播放_cur.value * 4 / 1) / 4;
+          let max = 樂譜.childElementCount * 顯示設定.c / 4 - 0.25;
+          播放_cur.value = Math.min(Math.max(播放_cur.value, 0), max);
+          播針_顯示();
+          播針_聲音();
           播放_cur.value = +播放_cur.value + 0.25;
-          播放一針();
-        }, 60e3 / +BPM.value / 4);
-      }
-      function 播放_聲音(arr) {
-        if(不要聲音.checked) return;
-        arr.forEach(音 => {
-          let audio = new Audio();
-          audio.addEventListener("canplaythrough", () => {
-            audio.play();
-          });
-          audio.src = `./${鼓聲[音]}.mp3`;
+          if(播放_cur.value > max) 播放_cur.value = 0;
+        }
+        function 播針_顯示() {
+          let 小節i = Math.floor(播放_cur.value / (顯示設定.c / 4));
+          let 小節 = 樂譜.children[小節i] || 樂譜.children[0];
+          小節.append(mark);
+          樂譜.scrollTop = 小節.offsetTop - 樂譜.offsetTop;
+          let c = 播放_cur.value % (顯示設定.c / 4) * 4 + 1;
+          mark.style.gridColumn = c;
+        }
+        function 播針_聲音() {
+          if(不要聲音.checked) return;
+          譜.filter(({時}) => 時 == +播放_cur.value)
+          .map(data => {
+            if(data.鼓框) return "小鼓_鼓框";
+            if(data.開鈸) return "高帽鈸_開鈸";
+            return data.音;
+          })
+          .forEach(音 => 播一個音(音));
+        }
+
+        /* 循環區 */
+        function 這一直循環() {
+          if(播放狀態) {
+            if(new Date().getTime() - 開始時間 >= 間隔) {
+              開始時間 = new Date().getTime();
+              播針();
+            }
+          }
+          requestAnimationFrame(這一直循環);
+        }
+        requestAnimationFrame(這一直循環);
+
+        return obj;
+      })();
+
+      /* ================================ */
+      /*  聲音處理                        */
+      /* ================================ */
+      const 鼓聲名稱 = {
+        大鼓: "bass", 小鼓: "share-drum", 小鼓_鼓框: "share-stick",
+        // BD bass drum; SD; SS
+        高音中鼓: "tom1", 低音中鼓: "tom2", 落地鼓: "floor-tom",
+        // T1 high tom; T2 low tom; FT
+        碎音鈸: "crash", 疊音鈸: "ride",
+        // CC crash cymbal; RC ride cymbal
+        高帽鈸: "hihat", 高帽鈸_開鈸: "hihat-open", 腳踏鈸: "hihat-foot",
+        // HH; HO; HF
+      };
+      const 鼓聲 = {};
+      function 聲音初始化() {
+        Object.entries(鼓聲名稱).forEach(([名稱, 檔名]) => {
+          鼓聲[名稱] = {i: 0, arr: []};
+          for(let i = 0; i < 8; i++) {
+            let audio = new Audio();
+            audio.src = `./${檔名}.mp3`;
+            鼓聲[名稱].arr.push(audio);
+          }
         });
       }
-      function 改變BPM() {
-        if(!播放_interval) return;
-        播放_暫停();
-        播放_播放();
+      function 播一個音(名稱) {
+        let 音obj = 鼓聲[名稱];
+        音obj.arr[音obj.i].play();
+        音obj.i = (音obj.i + 1) % 8;
       }
+      聲音初始化();
 
       /* ================================ */
       /*  點擊處理                        */
