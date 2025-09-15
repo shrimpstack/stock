@@ -108,8 +108,10 @@
       <button onclick="播放器.播放()">播放</button>
       BPM <input id="BPM" type="number" oninput="播放器.改變BPM()" value="60" style="width: 60px;"/>
       指針 <input id="播放_cur" type="number" oninput="播放器.播針()" step="0.25" value="0" style="width: 60px;"/>
+      <button onclick="播放_cur.value = +播放_cur.value - 4; 播放器.播針();">←←</button>
       <button onclick="播放_cur.value = +播放_cur.value - 0.25; 播放器.播針();">←</button>
-      <button onclick="播放_cur.value = +播放_cur.value + 0.25; 播放器.播針();">→</button><br/>
+      <button onclick="播放_cur.value = +播放_cur.value + 0.25; 播放器.播針();">→</button>
+      <button onclick="播放_cur.value = +播放_cur.value + 4; 播放器.播針();">→→</button><br/>
       <label><input type="checkbox" onclick="樂譜.classList.toggle('不要字', this.checked)" checked />隱藏唸法</label>
       <label><input id="不要聲音" type="checkbox" checked />不要聲音</label>
     </div>
@@ -542,3 +544,4 @@
     </script>
   </body>
 </html>
+
