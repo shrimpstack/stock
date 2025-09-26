@@ -6,6 +6,7 @@ window.addEventListener("load", () => {
     點擊開始(target, pageX, pageY);
   });
   樂譜.addEventListener("touchstart", ({target, touches}) => {
+    if(touches.length > 1) return;
     let {pageX, pageY} = touches[0];
     點擊開始(target, pageX, pageY);
     已經touch = true;
