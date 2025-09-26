@@ -61,7 +61,7 @@ async function 讀取固定譜() {
   if(res.data) 樂譜操作.顯示譜資料(res.data);
   載入畫面.toggle = false;
 }
-async function 儲存目前的譜() {
+async function 儲存目前的譜(覆蓋) {
   if(!儲存譜名.value) {
     alert("名稱不能空白");
     return;
@@ -74,8 +74,13 @@ async function 儲存目前的譜() {
     sents: 譜資料.元素表,
     sheet: 譜資料.譜句表,
     lyrics: 譜資料.歌詞表,
+    replace: !!覆蓋,
   });
-  alert(res.data.error || res.data.success);
+  if(res.data.error == "這個譜名已經存在") {
+    let 要不要覆蓋 = confirm("這個譜名已經存在，確定要覆蓋嗎？");
+    if(要不要覆蓋) return 儲存目前的譜(true);
+  }
+  else alert(res.data.error || res.data.success);
   載入畫面.toggle = false;
 }
 
