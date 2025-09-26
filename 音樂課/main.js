@@ -269,6 +269,7 @@ const 樂譜操作 = (() => {
       }).join(" ");
   }
   function 清空目前樂譜() {
+    播放器.指針位置 = 0;
     樂譜.querySelectorAll(".小節:not(:first-child), i, input").forEach(el => el.remove());
     dot譜 = [];
     dot歌詞表 = [];
