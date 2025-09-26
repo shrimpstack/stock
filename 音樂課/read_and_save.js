@@ -66,7 +66,7 @@ async function 儲存目前的譜(覆蓋) {
     alert("名稱不能空白");
     return;
   }
-  播放器.停止();
+  播放器.暫停();
   載入畫面.toggle = true;
   let 譜資料 = 樂譜操作.取得譜資料();
   let res = await post("儲存譜", {

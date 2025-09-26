@@ -20,6 +20,12 @@ const 播放器 = (() => {
       }
     },
   });
+  Object.defineProperty(obj, "暫停", {
+    writable: false,
+    value: () => {
+      播放狀態 = false;
+    },
+  });
   Object.defineProperty(obj, "停止", {
     writable: false,
     value: () => {
