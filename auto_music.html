@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>自動樂譜</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./main.css"/>
+    <link rel="stylesheet" href="./sheet_music.css"/>
+    <script src="./main.js"></script>
+    <script src="./player.js"></script>
+    <script src="./history.js"></script>
+    <script src="./mouse.js"></script>
+    <script src="./read_and_save.js"></script>
+  </head>
+  <body>
+    <div id="控制區">
+      <div id="控制區頁籤">
+        <button onclick="控制區.removeAttribute('page')">收起</button>
+        <button onclick="控制區.setAttribute('page', '讀取固定譜')">讀取固定譜</button>
+        <button onclick="控制區.setAttribute('page', '產生隨機譜')">產生隨機譜</button>
+        <button onclick="控制區.setAttribute('page', '儲存固定譜')">儲存固定譜</button>
+        <button onclick="控制區.setAttribute('page', '編輯隨機譜')">編輯隨機譜</button>
+      </div>
+      <div page="讀取固定譜">
+        <select id="固定譜名"></select><button onclick="讀取固定譜()">讀取固定譜</button><br/>
+      </div>
+      <div page="儲存固定譜">
+        <input id="儲存譜名"/><button onclick="儲存目前的譜()">儲存目前的譜</button><br/>
+      </div>
+      <div page="產生隨機譜">
+        <label><input id="隨機譜開頭要幾小節" value="1"/>開頭小節</label>
+        <label><input id="隨機譜要幾小節" value="8"/>小節</label>
+        <button onclick="產生隨機譜()">產生</button>
+        <input id="隨機譜模式" value="頭 身 身 尾"/>
+      </div>
+      <div page="編輯隨機譜">
+        <label><input id="編輯隨機類名"/>類名</label>
+        <button onclick="讀取隨機列表()">讀取隨機列表</button>
+        <button onclick="儲存隨機列表()">儲存隨機列表</button>
+      </div>
+    </div>
+    <div id="一般操作區">
+      <button onclick="新增小節()">新增小節</button>
+      <button onclick="歷史管理.上一步()">上一步</button>
+      <button onclick="歷史管理.下一步()">下一步</button><br/>
+
+      <button onclick="播放器.停止()">⏹</button>
+      <button onclick="播放器.播放切換()">⏯</button>
+      BPM <input id="BPM" type="number" oninput="播放器.改變BPM()" value="60"/><br/>
+
+      <button onclick="播放器.上一小節();">↞</button>
+      <button onclick="播放器.上一拍();">←</button>
+      <input id="第幾小節input" type="number" oninput="播放器.從輸入框更新指針()" value="1"/>
+      <input id="第幾拍input" type="number" oninput="播放器.從輸入框更新指針()" value="1"/>
+      <button onclick="播放器.下一拍();">→</button>
+      <button onclick="播放器.下一小節();">↠</button><br/>
+      <label><input type="checkbox" onclick="樂譜.classList.toggle('不要字', this.checked)" checked />隱藏唸法</label>
+      <label><input id="不要聲音" type="checkbox" checked />不要聲音</label>
+    </div>
+    <div id="樂譜" class="不要字">
+      <div class="小節" index="1"><mark id="mark"></mark></div>
+    </div>
+    <div id="載入中" class="hidden"></div>
+  </body>
+</html>

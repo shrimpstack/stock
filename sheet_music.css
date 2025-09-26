@@ -1,0 +1,85 @@
+#樂譜 {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  height: 100%;
+  overflow: auto;
+  scroll-behavior: smooth;
+  user-select: none;
+}
+#樂譜::-webkit-scrollbar { display: none; }
+.小節 {
+  display: grid;
+  grid-template-rows: repeat(var(--sound_count), var(--sq_h));
+  grid-template-columns: repeat(var(--note_count), 1fr);
+  height: max-content;
+  gap: var(--line_width);
+  background: var(--sd_bg), var(--bar_bg), var(--sound_bg), var(--note_bg);
+  background-color: #eee;
+  overflow: hidden;
+}
+.小節:after {
+  content: attr(index);
+  grid-area: 1 / 1;
+  font-size: var(--sq_h);
+  font-family: sans-serif;
+  text-align: center;
+  pointer-events: none;
+  position: relative;
+  top: -1px;
+  font-weight: bold;
+  opacity: .5;
+}
+.小節 i {
+  border: 1px solid #0003;
+  border-radius: 4px;
+}
+i:before {
+  display: block;
+  text-align: center;
+  opacity: .2;
+  font-style: normal;
+  font-size: var(--sq_h);
+  line-height: 1;
+}
+i.碎音鈸 { grid-row: 1; background: #efac7f; } i.碎音鈸:before { content: "磅"; }
+i.高帽鈸 { grid-row: 2; background: #ebe697; } i.高帽鈸:before { content: "此"; }
+i.高帽鈸.開鈸 { background: #f5f3c9; } i.高帽鈸.開鈸:before { content: "叮"; }
+i.疊音鈸 { grid-row: 3; background: #fca; } i.疊音鈸:before { content: "聽"; }
+i.高音中鼓 { grid-row: 4; background: #abdaf7; } i.高音中鼓:before { content: "湯"; }
+i.低音中鼓 { grid-row: 5; background: #a3c3ff; } i.低音中鼓:before { content: "通"; }
+i.小鼓 { grid-row: 6; background: #8ec98e; } i.小鼓:before { content: "噠"; }
+i.小鼓.鼓框 { background: #d6f7d6; } i.小鼓.鼓框:before { content: "喀"; }
+i.落地鼓 { grid-row: 7; background: #a99bdd; } i.落地鼓:before { content: "碰"; }
+i.大鼓 { grid-row: 8; background: #ef9e9e; } i.大鼓:before { content: "動"; }
+i.腳踏鈸 { grid-row: 9; background: #ebe697; } i.腳踏鈸:before { content: "他"; }
+i.碎音鈸[style="grid-column: 1 / span 1;"]:before { display: none; }
+#樂譜.不要字 i:before { display: none; }
+i[l="4"] { grid-column-end: 16 span; }
+i[l="3"] { grid-column-end: 12 span; }
+i[l="2"] { grid-column-end: 8 span; }
+i[l="1.5"] { grid-column-end: 6 span; }
+i[l="1"] { grid-column-end: 4 span; }
+i[l="0.75"] { grid-column-end: 3 span; }
+i[l="0.5"] { grid-column-end: 2 span; }
+i[l="0.25"] { grid-column-end: 1 span; }
+#mark {
+  background: #52c75252;
+  grid-column: 1;
+  grid-row: 1 / -1;
+  pointer-events: none;
+}
+
+.小節 input.歌詞 {
+  all: unset;
+  border: 1px solid #0003;
+  border-radius: 4px;
+  grid-row: 10; background: #eee;
+  font-size: calc(var(--sq_h) - 2px);
+  line-height: 1;
+  opacity: .8;
+  text-align: left;
+  font-style: normal;
+  width: 100%;
+  box-sizing: border-box;
+}
