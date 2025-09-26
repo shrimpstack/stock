@@ -39,6 +39,8 @@ i:before {
   text-align: center;
   opacity: .2;
   font-style: normal;
+  font-size: var(--sq_h);
+  line-height: 1;
 }
 i.碎音鈸 { grid-row: 1; background: #efac7f; } i.碎音鈸:before { content: "磅"; }
 i.高帽鈸 { grid-row: 2; background: #ebe697; } i.高帽鈸:before { content: "此"; }
@@ -66,4 +68,18 @@ i[l="0.25"] { grid-column-end: 1 span; }
   grid-column: 1;
   grid-row: 1 / -1;
   pointer-events: none;
+}
+
+.小節 input.歌詞 {
+  all: unset;
+  border: 1px solid #0003;
+  border-radius: 4px;
+  grid-row: 10; background: #eee;
+  font-size: calc(var(--sq_h) - 2px);
+  line-height: 1;
+  opacity: .8;
+  text-align: left;
+  font-style: normal;
+  width: 100%;
+  box-sizing: border-box;
 }

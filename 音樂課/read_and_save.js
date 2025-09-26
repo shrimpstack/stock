@@ -69,7 +69,12 @@ async function 儲存目前的譜() {
   播放器.停止();
   載入畫面.toggle = true;
   let 譜資料 = 樂譜操作.取得譜資料();
-  let res = await post("儲存譜", {name: 儲存譜名.value, sents: 譜資料.元素表, sheet: 譜資料.譜句表});
+  let res = await post("儲存譜", {
+    name: 儲存譜名.value,
+    sents: 譜資料.元素表,
+    sheet: 譜資料.譜句表,
+    lyrics: 譜資料.歌詞表,
+  });
   alert(res.data.error || res.data.success);
   載入畫面.toggle = false;
 }

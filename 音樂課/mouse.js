@@ -43,7 +43,13 @@ window.addEventListener("load", () => {
     單位h = 顯示設定.一格h + 顯示設定.線條寬度;
     let 音符中心x = pageX - offsetX % 單位w + 單位w / 2;
     let 音符中心y = pageY - offsetY % 單位h + 單位h / 2;
-    if(target.matches("i")) {
+    if(target.matches("input")) {
+      起點i = target;
+      按下時音符中心y = 音符中心y;
+      起點是哪 = "歌詞身";
+      已經按下 = true;
+    }
+    else if(target.matches("i")) {
       起點i = target;
       按下時音符中心x = 音符中心x;
       按下時音符中心y = 音符中心y;
@@ -53,14 +59,25 @@ window.addEventListener("load", () => {
       已經按下 = true;
     }
     else if(target.matches(".小節")) {
-      按下時音符中心x = 音符中心x;
-      按下時音符中心y = 音符中心y;
-      起點是哪 = "小節";
-      已經按下 = true;
       let grid_c = Math.floor(offsetX / 單位w) + 1;
       let grid_r = Math.floor(offsetY / 單位h) + 1;
-      let 音符i = 按下小節時新增音符(grid_r, grid_c);
-      起點i = 音符i;
+      if(grid_r == 10) {
+        let 歌詞input = 按下小節時新增歌詞(target, grid_c);
+        if(!歌詞input) return;
+        起點是哪 = "歌詞";
+        起點i = 歌詞input;
+      }
+      else {
+        let 音符i = 按下小節時新增音符(target, grid_r, grid_c);
+        if(!音符i) return;
+        起點是哪 = "小節";
+        起點i = 音符i;
+      }
+      if(起點i) {
+        按下時音符中心x = 音符中心x;
+        按下時音符中心y = 音符中心y;
+        已經按下 = true;
+      }
     }
   }
   function 滑鼠移動中(pageX, pageY) {
@@ -69,7 +86,7 @@ window.addEventListener("load", () => {
       let 已移動x = pageX - 按下時音符中心x;
       if(Math.abs(已移動x) > 單位w / 2) {
         if(起點是哪 == "音符頭") 滑動狀態 = "移動音符";
-        else if(起點是哪 == "音符身" || 起點是哪 == "小節") 滑動狀態 = "調整音符長度";
+        else if(起點是哪 == "音符身" || 起點是哪 == "小節" || 起點是哪 == "歌詞") 滑動狀態 = "調整音符長度";
       }
       return;
     }
@@ -86,6 +103,10 @@ window.addEventListener("load", () => {
   }
   function 點擊結束(pageX, pageY) {
     if(!已經按下) return;
+    if(起點是哪 == "歌詞身") {
+      let 已移動y = 按下時音符中心y - pageY;
+      if(Math.abs(已移動y) > 單位h * 3) 滑動刪除歌詞(起點i);
+    }
     if(起點是哪 == "音符頭" || 起點是哪 == "音符身") {
       let 已移動y = 按下時音符中心y - pageY;
       if(Math.abs(已移動y) > 單位h * 3) 滑動刪除音符(起點i);

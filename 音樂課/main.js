@@ -40,6 +40,16 @@ function 音符編碼_轉_dot(音符編碼) {
   }
   return dot;
 }
+function 歌詞編碼_轉_dot(歌詞編碼) {
+  if(!歌詞編碼) return null;
+  let [歌詞, 歌詞位置, 歌詞長度] = 歌詞編碼.split("-");
+  let dot = {
+    詞: 歌詞,
+    時: +歌詞位置,
+    長: +歌詞長度,
+  };
+  return dot;
+}
 /* OX譜 <=> 譜編碼 */
 function OX譜_轉_譜編碼(OX譜) {
   let 譜編碼 = [];
@@ -94,10 +104,18 @@ function 譜編碼_轉_OX譜(譜編碼) {
 /* ================================ */
 /*  操作                            */
 /* ================================ */
-function 按下小節時新增音符(grid_r, grid_c) {
+function 按下小節時新增歌詞(小節el, grid_c) {
+  let 點了第幾小節 = [...樂譜.children].indexOf(小節el);
+  let 歌詞位置 = 點了第幾小節 * 顯示設定.一小節幾音符 + (grid_c - 1);
+  let dot = {詞: "", 時: 歌詞位置, 長: 1};
+  if(檢查點擊位置是否衝突(dot)) return;
+  let 音符i = 樂譜操作.新增詞dot(dot);
+  return 音符i;
+}
+function 按下小節時新增音符(小節el, grid_r, grid_c) {
   let 音符名 = grid_r_轉_音符名(grid_r);
   if(!音符名) return;
-  let 點了第幾小節 = [...樂譜.children].indexOf(event.target);
+  let 點了第幾小節 = [...樂譜.children].indexOf(小節el);
   let 音符位置 = 點了第幾小節 * 顯示設定.一小節幾音符 + (grid_c - 1);
   let dot = {音: 音符名, 時: 音符位置, 長: 1};
   if(檢查點擊位置是否衝突(dot)) return;
@@ -111,19 +129,25 @@ function 新增小節() {
   新小節.setAttribute("index", document.querySelectorAll(".小節").length);
 }
 function 滑動調整音符長度(target_i, 目標長度) {
-  let 檢查長度 = [顯示設定.一音符最長幾格];
+  let 檢查長度 = [];
+  if(target_i.matches("i")) 檢查長度.push(顯示設定.一音符最長幾格);
   let 最近dot = 往後尋找最接近的dot(target_i.dot);
   if(最近dot) 檢查長度.push(最近dot.時 - target_i.dot.時);
   檢查長度.push(顯示設定.一小節幾音符 - target_i.dot.時 % 顯示設定.一小節幾音符);
   let 最大長度 = Math.min(...檢查長度);
   目標長度 = Math.min(Math.max(Math.floor(+目標長度 || 0), 1), 最大長度);
   target_i.dot.長 = 目標長度;
-  更新i顯示(target_i);
+  更新cell顯示(target_i);
 }
 function 滑動刪除音符(target_i) {
   let index = dot譜.indexOf(target_i.dot);
   dot譜.splice(index, 1);
   target_i.remove();
+}
+function 滑動刪除歌詞(target_input) {
+  let index = dot歌詞表.indexOf(target_input.dot);
+  dot歌詞表.splice(index, 1);
+  target_input.remove();
 }
 function 滑動移動音符(target_i, target_grid_c) {
   let 在第幾小節 = Math.floor(target_i.dot.時 / 顯示設定.一小節幾音符);
@@ -138,7 +162,7 @@ function 滑動移動音符(target_i, target_grid_c) {
   let 目標位置 = 在第幾小節 * 顯示設定.一小節幾音符 + target_grid_c - 1;
   目標位置 = Math.min(Math.max(Math.floor(+目標位置 || 0), 最小位置), 最大位置);
   target_i.dot.時 = 目標位置;
-  更新i顯示(target_i);
+  更新cell顯示(target_i);
 }
 function 點擊切換音色(target_i) {
   let dot = target_i.dot;
@@ -150,30 +174,59 @@ function 點擊切換音色(target_i) {
 /*  dot譜動作                       */
 /* ================================ */
 let dot譜 = []; // dot[]
+let dot歌詞表 = []; // dot[]
 function 檢查點擊位置是否衝突(check_dot) {
+  if(check_dot.詞 != undefined) {
+    return !!dot歌詞表
+      .filter(dot => dot != check_dot)
+      .find(dot => dot.時 < check_dot.時 + check_dot.長 && dot.時 + dot.長 > check_dot.時);
+  }
   return !!dot譜
     .filter(dot => dot != check_dot && dot.音 == check_dot.音)
     .find(dot => dot.時 < check_dot.時 + check_dot.長 && dot.時 + dot.長 > check_dot.時);
 }
 function 往後尋找最接近的dot(check_dot) {
+  if(check_dot.詞 != undefined) {
+    return dot歌詞表
+      .filter(dot => dot != check_dot && dot.時 > check_dot.時)
+      .sort((dotA, dotB) => dotA.時 - dotB.時)[0] || null;
+  }
   return dot譜
     .filter(dot => dot != check_dot && dot.音 == check_dot.音 && dot.時 > check_dot.時)
     .sort((dotA, dotB) => dotA.時 - dotB.時)[0] || null;
 }
 function 往前尋找最接近的dot(check_dot) {
+  if(check_dot.詞 != undefined) {
+    return dot歌詞表
+      .filter(dot => dot != check_dot && dot.時 < check_dot.時)
+      .sort((dotA, dotB) => dotB.時 - dotA.時)[0] || null;
+  }
   return dot譜
     .filter(dot => dot != check_dot && dot.音 == check_dot.音 && dot.時 < check_dot.時)
     .sort((dotA, dotB) => dotB.時 - dotA.時)[0] || null;
 }
-function 更新i顯示(i) {
-  let grid_c = (i.dot.時 % 顯示設定.一小節幾音符) + 1;
-  i.style.gridColumn = `${grid_c} / ${i.dot.長} span`;
+function 更新cell顯示(target) {
+  let grid_c = (target.dot.時 % 顯示設定.一小節幾音符) + 1;
+  target.style.gridColumn = `${grid_c} / ${target.dot.長} span`;
 }
 
 /* ================================ */
 /*  樂譜動作                        */
 /* ================================ */
 const 樂譜操作 = (() => {
+  function 往樂譜新增一個詞dot(dot) {
+    let 要加在第幾小節 = Math.floor(dot.時 / 顯示設定.一小節幾音符);
+    let input = document.createElement("input");
+    input.dot = dot;
+    input.classList.add("歌詞");
+    input.value = dot.詞;
+    input.addEventListener("input", () => dot.詞 = input.value);
+    input.addEventListener("change", () => 歷史管理.記住());
+    更新cell顯示(input);
+    dot歌詞表.push(dot);
+    樂譜.children[要加在第幾小節].append(input);
+    return input;
+  }
   function 往樂譜新增一個dot(dot) {
     let 要加在第幾小節 = Math.floor(dot.時 / 顯示設定.一小節幾音符);
     let i = document.createElement("i");
@@ -181,7 +234,7 @@ const 樂譜操作 = (() => {
     i.classList.add(dot.音);
     if(dot.鼓框) i.classList.add("鼓框");
     if(dot.開鈸) i.classList.add("開鈸");
-    更新i顯示(i);
+    更新cell顯示(i);
     dot譜.push(dot);
     樂譜.children[要加在第幾小節].append(i);
     return i;
@@ -201,9 +254,38 @@ const 樂譜操作 = (() => {
         return `${音符碼名}${技法碼}-${音符位置}-${音符長度}`;
       }).join(" ");
   }
+  function 取得樂譜中的歌詞(start小節, length小節) {
+    let 最多幾小節 = 樂譜.childElementCount;
+    let start時 = Math.min(Math.max(Math.floor(+start小節 || 0), 0), 最多幾小節 - 1) * 顯示設定.一小節幾音符;
+    if(!+length小節) length小節 = 最多幾小節;
+    let end時 = start時 + Math.min(Math.max(Math.floor(+length小節), 1), 最多幾小節) * 顯示設定.一小節幾音符 - 1;
+    return dot歌詞表
+      .filter(dot => dot.時 >= start時 && dot.時 <= end時)
+      .map(dot => {
+        let 歌詞字 = dot.詞.replace(/\-|\s/g, "") || "～";
+        let 歌詞位置 = dot.時 - start時;
+        let 歌詞長度 = dot.長;
+        return `${歌詞字}-${歌詞位置}-${歌詞長度}`;
+      }).join(" ");
+  }
   function 清空目前樂譜() {
-    樂譜.querySelectorAll(".小節:not(:first-child), i").forEach(el => el.remove());
+    樂譜.querySelectorAll(".小節:not(:first-child), i, input").forEach(el => el.remove());
     dot譜 = [];
+    dot歌詞表 = [];
+  }
+  function 往樂譜加入歌詞碼(位置歌詞碼) {
+    let 位於小節 = 位置歌詞碼[0] == "[" ? +位置歌詞碼.replace(/^\[|\].*$/g, "") : 0;
+    let start時 = 位於小節 * 顯示設定.一小節幾音符;
+    let 歌詞碼 = 位置歌詞碼.replace(/^.*\]/g, "");
+    let 新dot列 = !歌詞碼 ? [] : 歌詞碼.split(" ").map(歌詞編碼 => {
+      let dot = 歌詞編碼_轉_dot(歌詞編碼);
+      dot.時 += start時;
+      return dot;
+    });
+    let 最遠位置 = Math.max(...新dot列.map(({時, 長}) => 時 + 長));
+    let 幾小節 = Math.ceil(最遠位置 / 顯示設定.一小節幾音符);
+    while(樂譜.childElementCount < 幾小節) 新增小節();
+    新dot列.forEach(dot => 往樂譜新增一個詞dot(dot));
   }
   function 往樂譜加入譜編碼(位置譜編碼) {
     let 位於小節 = 位置譜編碼[0] == "[" ? +位置譜編碼.replace(/^\[|\].*$/g, "") : 0;
@@ -242,6 +324,11 @@ const 樂譜操作 = (() => {
       樂譜操作.加入譜編碼(`[${位於小節}]${譜編碼}`);
     });
 
+    /* 歌詞表顯示 */
+    譜資料.歌詞表
+    .map(歌詞句子 => 歌詞句子.split(" ")).flat() // 全部切成歌詞段
+    .forEach(歌詞段 => 樂譜操作.加入歌詞碼(歌詞段));
+
     /* 讓歷史可以上下一步操作 */
     歷史管理.記住();
   }
@@ -249,6 +336,7 @@ const 樂譜操作 = (() => {
     let 譜資料 = {
       元素表: {},
       譜句表: [],
+      歌詞表: [],
     };
     let 已存在的OX譜紀錄 = {};
     let 元素名arr = [...樂譜.children]
@@ -268,15 +356,24 @@ const 樂譜操作 = (() => {
       let 本句起點小節i = 譜句i * 幾小節為一句;
       譜資料.譜句表[譜句i] = 元素名arr.slice(本句起點小節i, 本句起點小節i + 幾小節為一句).join(" ");
     }
+
+    for(let 歌詞句i=0; 歌詞句i<分成幾句; 歌詞句i++) {
+      let 本句起點小節i = 歌詞句i * 幾小節為一句;
+      let 本句歌詞 = 樂譜操作.取得歌詞碼(本句起點小節i, 幾小節為一句);
+      if(本句歌詞) 譜資料.歌詞表.push(`[${本句起點小節i}]${本句歌詞}`);
+    }
     return 譜資料;
   }
   return {
     新增dot: 往樂譜新增一個dot,
+    新增詞dot: 往樂譜新增一個詞dot,
     取得譜編碼: 取得樂譜中的譜編碼,
+    取得歌詞碼: 取得樂譜中的歌詞,
     取得譜資料: 將目前樂譜轉為譜資料,
     顯示譜資料: 將譜資料顯示到樂譜畫面,
     清空: 清空目前樂譜,
     加入譜編碼: 往樂譜加入譜編碼,
+    加入歌詞碼: 往樂譜加入歌詞碼,
   };
 })();
 
