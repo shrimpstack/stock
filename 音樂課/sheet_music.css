@@ -68,6 +68,7 @@ i[l="0.25"] { grid-column-end: 1 span; }
   grid-column: 1;
   grid-row: 1 / -1;
   pointer-events: none;
+  position: relative;
 }
 
 .小節 input.歌詞 {
