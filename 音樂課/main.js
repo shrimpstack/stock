@@ -349,7 +349,7 @@ const 樂譜操作 = (() => {
       return `[${小節i}]${元素名}`;
     });
 
-    let 幾小節為一句 = 20;
+    let 幾小節為一句 = 12;
     let 分成幾句 = Math.ceil(樂譜.childElementCount / 幾小節為一句);
     for(let 譜句i=0; 譜句i<分成幾句; 譜句i++) {
       let 本句起點小節i = 譜句i * 幾小節為一句;
